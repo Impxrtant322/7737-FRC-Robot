@@ -6,12 +6,20 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.drivebase.AbsoluteDriveAdv;
+import frc.robot.commands.drivebase.AbsoluteDrive;
+import frc.robot.commands.drivebase.AbsoluteFieldDrive;
+import frc.robot.commands.Intake;
+import frc.robot.commands.Launcher;
+import frc.robot.commands.emergencyStop;
+import frc.robot.commands.Launch;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 import java.io.File;
 
@@ -27,7 +35,6 @@ import swervelib.SwerveDrive;
 import swervelib.math.*;
 import swervelib.parser.SwerveParser;
 import frc.robot.subsystems.*;
-import java.io.File;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -54,6 +61,8 @@ public class RobotContainer {
 	public POVButton RIGHTDriver = new POVButton(driverXbox, 90);
 
     SwerveSubsystem drivebase = new SwerveSubsystem();
+    LauncherSubsystem LauncherSubsystem = new LauncherSubsystem();
+    IntakeSubsystem IntakeSubsystem = new IntakeSubsystem();
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -73,17 +82,33 @@ public class RobotContainer {
                                                                    driverXbox::getXButtonPressed,
                                                                    driverXbox::getBButtonPressed);
 
+    AbsoluteDrive closedAbsoluteDrive = new AbsoluteDrive(drivebase, () -> MathUtil.applyDeadband(driverXbox.getLeftY(),
+                                                                                                OperatorConstants.LEFT_Y_DEADBAND),
+                                                                     () -> MathUtil.applyDeadband(driverXbox.getLeftX(),
+                                                                                                OperatorConstants.LEFT_X_DEADBAND),
+                                                                     () -> driverXbox.getRightY(),
+                                                                     () -> driverXbox.getRightX());
+
+    AbsoluteFieldDrive closedAbsoluteFieldDrive = new AbsoluteFieldDrive(drivebase, 
+                                                                   () -> MathUtil.applyDeadband(driverXbox.getLeftY(),
+                                                                                                OperatorConstants.LEFT_Y_DEADBAND),
+                                                                   () -> MathUtil.applyDeadband(-driverXbox.getLeftX(),
+                                                                                                OperatorConstants.LEFT_X_DEADBAND), 
+                                                                   () -> driverXbox.getRightX());
+
 
     Command driveFieldOrientedDirectAngle = drivebase.driveCommand(
                                                                    () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-                                                                   () -> MathUtil.applyDeadband(-driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+                                                                   () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
                                                                    () -> driverXbox.getRightX(),
                                                                    () -> driverXbox.getRightY());
 
-    Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
+    Command driveFieldOrientedAngularVelocity = drivebase.driveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRawAxis(4));
+        () -> MathUtil.applyDeadband(driverXbox.getRawAxis(4), .1));
+
+    
 
     Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
@@ -91,13 +116,20 @@ public class RobotContainer {
         () -> driverXbox.getRawAxis(2));
 
     drivebase.setDefaultCommand(
-        !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
+        !RobotBase.isSimulation() ? driveFieldOrientedAngularVelocity : driveFieldOrientedDirectAngleSim);
   }
 
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
     xButtonDriver.onTrue(new InstantCommand(drivebase::zeroGyro));
+    aButtonDriver.onTrue(new Intake(IntakeSubsystem, LauncherSubsystem));
+    yButtonDriver.onTrue(new Launch(IntakeSubsystem, LauncherSubsystem));
+    DOWNDriver.onTrue(new emergencyStop(IntakeSubsystem, LauncherSubsystem));
+
+    //aButtonDriver.onTrue(new Launcher(LauncherSubsystem, "toggle"));
+    //bButtonDriver.onTrue(new Intake(IntakeSubsystem, "toggle"));
+    //bButtonDriver.onTrue(new Launcher(LauncherSubsystem, "load"));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
