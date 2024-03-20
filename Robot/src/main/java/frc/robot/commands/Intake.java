@@ -13,7 +13,6 @@ public class Intake extends Command {
   /** Creates a new Intake. */
   IntakeSubsystem IntakeSubsystem;
   LauncherSubsystem LauncherSubsystem;
-  boolean isFinished = false;
   Timer time = new Timer();
   public Intake(IntakeSubsystem IntakeSubsystem, LauncherSubsystem LauncherSubsystem) {
     this.IntakeSubsystem = IntakeSubsystem;
@@ -25,35 +24,27 @@ public class Intake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    time.start();
+    time.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    isFinished = false;
     LauncherSubsystem.intake();
     IntakeSubsystem.intakeOn();
-    if(time.get() >= 2) {
-      isFinished = true;
-    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     LauncherSubsystem.stop();
-      IntakeSubsystem.stop();
-      time.stop();
-      time.reset();
+    IntakeSubsystem.stop();
+    time.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(isFinished) {
-      return true;
-    }
-    return false;
+    return time.get() >= 2;
   }
 }
