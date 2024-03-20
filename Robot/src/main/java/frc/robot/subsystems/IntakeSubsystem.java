@@ -52,11 +52,6 @@ public double getEncoderVelocity() {
 
 public void intake() {
   intakeOn();
-  try {
-    Thread.yield(2000);
-  } catch (InterruptedException e) {
-    e.printStackTrace();
-  }
   intakeOff();
 }
 

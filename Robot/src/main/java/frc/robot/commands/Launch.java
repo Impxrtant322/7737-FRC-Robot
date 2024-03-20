@@ -14,6 +14,8 @@ public class Launch extends Command {
   /** Creates a new Launch. */
   IntakeSubsystem IntakeSubsystem;
   LauncherSubsystem LauncherSubsystem;
+  boolean isFinished = false;
+  Timer time = new Timer();
   public Launch(IntakeSubsystem IntakeSubsystem, LauncherSubsystem LauncherSubsystem) {
     this.IntakeSubsystem = IntakeSubsystem;
     this.LauncherSubsystem = LauncherSubsystem;
@@ -24,26 +26,38 @@ public class Launch extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    time.start();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    isFinished = false;
     LauncherSubsystem.launch();
-    Timer.delay(1.25);
-    IntakeSubsystem.launch();
-    Timer.delay(1);
-    IntakeSubsystem.stop();
-    LauncherSubsystem.stop();
+    if(time.get() >= 1.25) {
+      IntakeSubsystem.launch();
+    }
+    if(time.get() >= 2.25) {
+      IntakeSubsystem.stop();
+      LauncherSubsystem.stop();
+      isFinished = true;
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    IntakeSubsystem.stop();
+    LauncherSubsystem.stop();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    if(isFinished) {
+      return true;
+    }
+    return false;
   }
 }
