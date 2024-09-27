@@ -30,8 +30,10 @@ public class Intake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    LauncherSubsystem.intake();
     IntakeSubsystem.intakeOn();
+    if(time.get() > 1.75) {
+      LauncherSubsystem.intake();
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -45,6 +47,6 @@ public class Intake extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return time.get() >= 2;
+    return time.get() >= 2.25;
   }
 }

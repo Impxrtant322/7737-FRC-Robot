@@ -22,20 +22,28 @@ public class LauncherSubsystem extends SubsystemBase {
     motor2.set(0);
     motor3.set(0);
     motor4.set(0);
+    motor1.setClosedLoopRampRate(.5);
+    motor2.setClosedLoopRampRate(.5);
+    motor3.setClosedLoopRampRate(.5);
+    motor4.setClosedLoopRampRate(.5);
     motor2.follow(motor1);
     motor4.follow(motor3);
   }
 
   public void launch() {
     motor1.set(power);
-    motor3.set(-power);
+    motor3.set(-power); //-power
+  }
+
+  public void output() {
+    motor1.set(-.7);
+    motor3.set(.7); //.2
   }
 
   public void stop() {
     motor1.set(0);
     motor3.set(0);
   }
-
   public void load() {
     motor1.set(0);
     motor3.set(0);
@@ -59,8 +67,13 @@ public class LauncherSubsystem extends SubsystemBase {
   }
 
   public void intake() {
-    motor1.set(0);
-    motor3.set(0);
+    motor1.set(.1);
+    motor3.set(-.1); //-.1
+  }
+
+  public void launchAmp() {
+    motor1.set(.3);
+    motor3.set(-.3);  //-.5
   }
 
   public void emergencyStop() {

@@ -42,6 +42,10 @@ public void launch() {
   motor1.set(power);
 }
 
+public void launchAmp() {
+  motor1.set(power);
+}
+
 public void stop() {
   motor1.set(0);
 }

@@ -10,12 +10,12 @@ import frc.robot.subsystems.LauncherSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 
 
-public class Launch extends Command {
+public class LaunchAmp extends Command {
   /** Creates a new Launch. */
   IntakeSubsystem IntakeSubsystem;
   LauncherSubsystem LauncherSubsystem;
   Timer time = new Timer();
-  public Launch(IntakeSubsystem IntakeSubsystem, LauncherSubsystem LauncherSubsystem) {
+  public LaunchAmp(IntakeSubsystem IntakeSubsystem, LauncherSubsystem LauncherSubsystem) {
     this.IntakeSubsystem = IntakeSubsystem;
     this.LauncherSubsystem = LauncherSubsystem;
 
@@ -39,10 +39,10 @@ public class Launch extends Command {
       LauncherSubsystem.stop();
     }
     if(time.get() > .7 && time.get() < 2) {
-      LauncherSubsystem.launch();
+      LauncherSubsystem.launchAmp();
     }
     if(time.get() >= 2) {
-      IntakeSubsystem.launch();
+      IntakeSubsystem.launchAmp();
     }
   }
 

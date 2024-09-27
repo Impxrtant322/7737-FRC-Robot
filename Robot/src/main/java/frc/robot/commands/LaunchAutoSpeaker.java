@@ -10,12 +10,12 @@ import frc.robot.subsystems.LauncherSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 
 
-public class Launch extends Command {
+public class LaunchAutoSpeaker extends Command {
   /** Creates a new Launch. */
   IntakeSubsystem IntakeSubsystem;
   LauncherSubsystem LauncherSubsystem;
   Timer time = new Timer();
-  public Launch(IntakeSubsystem IntakeSubsystem, LauncherSubsystem LauncherSubsystem) {
+  public LaunchAutoSpeaker(IntakeSubsystem IntakeSubsystem, LauncherSubsystem LauncherSubsystem) {
     this.IntakeSubsystem = IntakeSubsystem;
     this.LauncherSubsystem = LauncherSubsystem;
 
